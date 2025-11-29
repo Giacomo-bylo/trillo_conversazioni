@@ -242,7 +242,7 @@ export const Dashboard = () => {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-1">
-                    {call.score?.identified_issues.map((issue, i) => (
+                    {call.score?.identified_issues?.map((issue, i) => (
                       <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
                         {issue}
                       </span>
