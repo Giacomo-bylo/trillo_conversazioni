@@ -55,7 +55,7 @@ export const Dashboard = () => {
   const conversionRate = totalCalls ? ((qualifiedCount / totalCalls) * 100).toFixed(1) : 0;
   
   const avgDuration = totalCalls 
-    ? Math.round(calls.reduce((sum, c) => sum + c.durata_chiamata, 0) / totalCalls)
+    ? Math.round(calls.reduce((sum, c) => sum + (c.durata_chiamata || 0), 0) / totalCalls)
     : 0;
 
   const callsWithScore = calls.filter(c => c.score);
@@ -74,7 +74,7 @@ export const Dashboard = () => {
       case CallOutcome.NOT_QUALIFIED:
         return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">Non qualificato</span>;
       default:
-        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">{outcome}</span>;
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">{outcome || 'N/A'}</span>;
     }
   };
 
@@ -225,14 +225,14 @@ export const Dashboard = () => {
                   {formatDate(call.created_at)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{call.lead_nome}</div>
-                  <div className="text-xs text-gray-500">{call.lead_telefono}</div>
+                  <div className="text-sm font-medium text-gray-900">{call.lead_nome || 'N/A'}</div>
+                  <div className="text-xs text-gray-500">{call.lead_telefono || ''}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {getOutcomeBadge(call.esito_qualificazione)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDuration(call.durata_chiamata)}
+                  {formatDuration(call.durata_chiamata || 0)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={cn("text-lg font-semibold", getScoreColor(call.score?.quality_score || 0))}>
@@ -247,7 +247,9 @@ export const Dashboard = () => {
                         {issue}
                       </span>
                     ))}
-                    {!call.score?.identified_issues.length && <span className="text-gray-400 text-xs italic">Nessun problema</span>}
+                    {(!call.score?.identified_issues || call.score.identified_issues.length === 0) && (
+                      <span className="text-gray-400 text-xs italic">Nessun problema</span>
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
