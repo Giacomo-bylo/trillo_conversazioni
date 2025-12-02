@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Phone, PhoneMissed, PhoneCallback, History, LogOut } from 'lucide-react';
+import { LayoutDashboard, Phone, PhoneMissed, PhoneForwarded, History, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -41,7 +41,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <SidebarItem icon={LayoutDashboard} label="Dashboard" path="/" active={location.pathname === '/'} />
           <SidebarItem icon={Phone} label="Chiamate" path="/calls" active={location.pathname === '/calls'} />
           <SidebarItem icon={PhoneMissed} label="Mancate" path="/missed-calls" active={location.pathname === '/missed-calls'} />
-          <SidebarItem icon={PhoneCallback} label="Callback" path="/callbacks" active={location.pathname === '/callbacks'} />
+          <SidebarItem icon={PhoneForwarded} label="Callback" path="/callbacks" active={location.pathname === '/callbacks'} />
           
           <div className="px-3 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
             Storico
