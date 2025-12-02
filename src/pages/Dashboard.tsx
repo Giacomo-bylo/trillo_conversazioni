@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   ArrowUpRight, ArrowDownRight, Clock, CheckCircle2, 
-  Filter, Search, ChevronRight, Phone, XCircle, PhoneCallback
+  Filter, Search, ChevronRight, Phone, PhoneCall
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCalls } from '@/hooks/useCalls';
@@ -99,7 +99,7 @@ export const Dashboard = () => {
           title="Da richiamare" 
           value={callbackCount}
           trendLabel="Callback richiesti"
-          icon={PhoneCallback}
+          icon={PhoneCall}
         />
         <MetricCard 
           title="Durata Media" 
