@@ -1,4 +1,4 @@
-import { Call, PromptVersion } from '@/types';
+import { Call, PromptVersion, CallOutcome } from '@/types';
 
 export const MOCK_CALLS: Call[] = [
   {
@@ -6,166 +6,142 @@ export const MOCK_CALLS: Call[] = [
     retell_call_id: 'call_123abc',
     lead_nome: 'Mario Rossi',
     lead_telefono: '+39 333 1234567',
-    esito_qualificazione: 'qualified',
-    durata_chiamata: 420,
+    esito_qualificazione: CallOutcome.QUALIFIED,
+    durata_chiamata: 180,
     created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     flagged: false,
+    riepilogo_chiamata: 'Il cliente ha un immobile da ristrutturare e non ha fretta di vendere. Fissato appuntamento.',
+    stato_immobile: 'Da ristrutturare, impianti vecchi',
+    problematiche_immobile: 'Impianti da rifare, finiture datate',
+    urgenza_cliente: 'bassa',
+    sentiment_cliente: 'positivo',
+    appuntamento_fissato: true,
     transcript: [
-      { role: 'agent', content: "Pronto? Parlo con il signor Mario Rossi?" },
-      { role: 'user', content: "Sì, sono io. Chi parla?" },
-      { role: 'agent', content: "Buongiorno, sono Chiara di Bilo. La chiamo riguardo l'immobile in via Roma. Ha un minuto?" },
+      { role: 'agent', content: "Buongiorno, sono Chiara, l'assistente virtuale di Bilo. Stiamo preparando la valutazione del suo immobile e avrei bisogno di un paio di informazioni. Ha un minuto?" },
       { role: 'user', content: "Sì, dica pure." },
-      { role: 'agent', content: "Mi racconta la situazione dell'immobile? Ha bisogno di lavori?" },
+      { role: 'agent', content: "C'è qualcosa che devo sapere sull'immobile? Problemi, lavori da fare, situazioni particolari?" },
       { role: 'user', content: "Beh, è un po' vecchio, gli impianti sono da rifare." },
-      { role: 'agent', content: "Capisco. Ci sono altre problematiche da segnalare, come umidità o problemi strutturali?" },
-      { role: 'user', content: "No, strutturalmente è a posto. Solo finiture e impianti." },
-      { role: 'agent', content: "Perfetto. Per quanto riguarda i tempi, qualora trovassimo un accordo, avrebbe flessibilità o preferisce concludere rapidamente?" },
-      { role: 'user', content: "Non ho fretta, l'importante è realizzare il giusto." },
-      { role: 'agent', content: "Perfetto, la sua situazione è proprio quella in cui lavoriamo meglio. Fissiamo una breve chiamata con un nostro consulente. Preferisce domani mattina alle 10:00 o dopodomani alle 15:00?" },
-      { role: 'user', content: "Domani mattina va bene." },
+      { role: 'agent', content: "Come dicevo, siamo quasi pronti con la valutazione del suo immobile. Il preliminare lo firmiamo in tempi rapidi — e lì riceve già un anticipo — mentre il rogito, cioè il saldo finale, arriva qualche mese dopo. Per lei il rogito può essere tra qualche mese, o ha bisogno di tempi più brevi?" },
+      { role: 'user', content: "No, non ho fretta. Qualche mese va bene." },
+      { role: 'agent', content: "Perfetto. La faccio ricontattare da un nostro consulente per approfondire insieme la sua situazione. Buona giornata!" },
     ],
-    score: {
-      id: 's1',
-      call_id: 'c1',
-      quality_score: 9,
-      completeness_score: 0.9,
-      naturalness_score: 0.85,
-      objection_handling_score: 0.9,
-      duration_score: 1.0,
-      sentiment: 'positive',
-      identified_issues: [],
-      analysis_status: 'completed',
-    },
   },
   {
     id: 'c2',
     retell_call_id: 'call_456def',
     lead_nome: 'Giulia Bianchi',
     lead_telefono: '+39 333 9876543',
-    esito_qualificazione: 'not_qualified',
-    durata_chiamata: 120,
+    esito_qualificazione: CallOutcome.NOT_QUALIFIED,
+    durata_chiamata: 90,
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    flagged: true,
+    flagged: false,
+    riepilogo_chiamata: 'Il cliente ha urgenza di vendere per pagare un debito. Non qualificato.',
+    stato_immobile: 'Buone condizioni',
+    urgenza_cliente: 'alta',
+    sentiment_cliente: 'neutro',
+    appuntamento_fissato: false,
+    obiezioni_cliente: 'Ha bisogno dei soldi entro un mese',
     transcript: [
-      { role: 'agent', content: "Buongiorno, parlo con Giulia Bianchi?" },
-      { role: 'user', content: "Sì, ma non ho tempo ora." },
-      { role: 'agent', content: "Sarò brevissima, chiamo per l'immobile. Volevo sapere se..." },
-      { role: 'user', content: "Vi ho già detto che voglio 200mila euro, punto." },
-      { role: 'agent', content: "Ok, arrivederci." }
+      { role: 'agent', content: "Buongiorno, sono Chiara, l'assistente virtuale di Bilo. Stiamo preparando la valutazione del suo immobile e avrei bisogno di un paio di informazioni. Ha un minuto?" },
+      { role: 'user', content: "Sì, velocemente." },
+      { role: 'agent', content: "C'è qualcosa che devo sapere sull'immobile? Problemi, lavori da fare, situazioni particolari?" },
+      { role: 'user', content: "No, l'appartamento è in buone condizioni." },
+      { role: 'agent', content: "Come dicevo, siamo quasi pronti con la valutazione del suo immobile. Il preliminare lo firmiamo in tempi rapidi — e lì riceve già un anticipo — mentre il rogito, cioè il saldo finale, arriva qualche mese dopo. Per lei il rogito può essere tra qualche mese, o ha bisogno di tempi più brevi?" },
+      { role: 'user', content: "No, ho bisogno dei soldi entro un mese. Devo pagare un debito." },
+      { role: 'agent', content: "Perfetto, grazie mille per le informazioni. Riceverà a breve la valutazione del suo immobile. Buona giornata!" },
     ],
-    score: {
-      id: 's2',
-      call_id: 'c2',
-      quality_score: 4,
-      completeness_score: 0.4,
-      naturalness_score: 0.6,
-      objection_handling_score: 0.2,
-      duration_score: 0.3,
-      sentiment: 'negative',
-      identified_issues: ['Interruzione brusca', 'Mancata gestione obiezione prezzo'],
-      analysis_status: 'completed',
-    },
   },
   {
     id: 'c3',
     retell_call_id: 'call_789ghi',
     lead_nome: 'Luca Verdi',
     lead_telefono: '+39 333 1122334',
-    esito_qualificazione: 'callback',
-    durata_chiamata: 240,
+    esito_qualificazione: CallOutcome.CALLBACK,
+    durata_chiamata: 45,
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
     flagged: false,
-    transcript: [],
-    score: {
-      id: 's3',
-      call_id: 'c3',
-      quality_score: 6,
-      completeness_score: 0.7,
-      naturalness_score: 0.8,
-      objection_handling_score: 0.5,
-      duration_score: 0.8,
-      sentiment: 'neutral',
-      identified_issues: ['Cliente indeciso', 'Agente troppo incalzante'],
-      analysis_status: 'completed',
-    },
+    riepilogo_chiamata: 'Il cliente era occupato, ha chiesto di essere richiamato dopo le 18.',
+    callback_orario: 'dopo le 18',
+    callback_motivo: 'occupato al lavoro',
+    sentiment_cliente: 'neutro',
+    transcript: [
+      { role: 'agent', content: "Buongiorno, sono Chiara, l'assistente virtuale di Bilo. Stiamo preparando la valutazione del suo immobile e avrei bisogno di un paio di informazioni. Ha un minuto?" },
+      { role: 'user', content: "No guardi, sono al lavoro adesso. Mi può richiamare dopo?" },
+      { role: 'agent', content: "Certamente. A che ora preferisce che la richiami?" },
+      { role: 'user', content: "Dopo le 18 va bene." },
+      { role: 'agent', content: "Perfetto, la richiamerò dopo le 18. Buona giornata!" },
+    ],
   },
   {
     id: 'c4',
     retell_call_id: 'call_101jkl',
     lead_nome: 'Anna Neri',
     lead_telefono: '+39 333 5566778',
-    esito_qualificazione: 'qualified',
-    durata_chiamata: 380,
+    esito_qualificazione: CallOutcome.QUALIFIED,
+    durata_chiamata: 150,
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 25).toISOString(),
     flagged: false,
+    riepilogo_chiamata: 'Immobile con successione in corso. Cliente disponibile ad aspettare. Qualificato.',
+    stato_immobile: 'Abitabile ma datato',
+    problematiche_immobile: 'Successione in corso, alcuni documenti da sistemare',
+    urgenza_cliente: 'bassa',
+    sentiment_cliente: 'positivo',
+    appuntamento_fissato: true,
     transcript: [],
-    score: {
-      id: 's4',
-      call_id: 'c4',
-      quality_score: 8,
-      completeness_score: 1,
-      naturalness_score: 0.9,
-      objection_handling_score: 0.8,
-      duration_score: 1.0,
-      sentiment: 'positive',
-      identified_issues: [],
-      analysis_status: 'completed',
-    },
   }
 ];
 
 export const MOCK_VERSIONS: PromptVersion[] = [
   {
     id: 'v1',
-    version_number: 1,
+    version_number: 2,
     prompt_text: `# Personality
-Sei Chiara, assistente vocale di Bilo. Italiana, tono caldo e professionale.
+Sei Chiara, assistente virtuale di Bilo. Italiana, tono caldo e professionale.
 Dai sempre del Lei. Frasi brevi e naturali.
 
 # Goal
-Capire due cose:
-1. L'immobile ha problematiche? (da ristrutturare, questioni da sistemare, ecc.)
-2. Il cliente ha fretta di incassare o può aspettare?
+Raccogliere due informazioni per completare la valutazione:
+1. L'immobile ha problematiche? (lavori da fare, questioni legali, situazioni particolari)
+2. Il cliente ha fretta di andare al rogito o può aspettare qualche mese?
 
-Se l'immobile ha problematiche e il cliente non ha fretta di incassare → fissa appuntamento.
-Se l'immobile è in ottime condizioni o il cliente ha fretta di incassare → chiudi con garbo.
+Se il cliente può aspettare per il rogito → fissa appuntamento con consulente.
+Se il cliente ha urgenza inequivocabile → chiudi con cortesia.
 
 # Conversation Flow
 
-## Qualificazione
-Chiedi una domanda alla volta, aspetta la risposta, poi passa alla successiva:
-1. "Mi racconta la situazione dell'immobile? Ha bisogno di lavori?"
-2. "Ci sono altre problematiche da segnalare?"
-3. "Per quanto riguarda i tempi, qualora trovassimo un accordo, avrebbe flessibilità sui tempi di pagamento o preferisce concludere rapidamente?"
+## Dopo il messaggio di benvenuto
+Se il cliente risponde sì o acconsente, procedi con la domanda sull'immobile.
 
-Mai fare due domande nella stessa frase. Aspetta sempre la risposta prima di procedere.
-Mai suggerire esempi specifici di problematiche. Lascia che sia il cliente a specificare.
+Se risponde no o è occupato:
+"Nessun problema. A che ora preferisce che la richiami?"
+Conferma l'orario e chiudi con cortesia.
 
-## Se adatto
-"Perfetto, la sua situazione è proprio quella in cui lavoriamo meglio. Fissiamo una breve chiamata con un nostro consulente. Preferisce mattina o pomeriggio?"
+## Domanda 1 — Immobile (UNA SOLA DOMANDA)
+"C'è qualcosa che devo sapere sull'immobile? Problemi, lavori da fare, situazioni particolari?"
 
-## Se non adatto
-"Grazie mille per la chiarezza. Al momento il nostro servizio non è la soluzione più adatta alla sua situazione. Se qualcosa cambia, ci ricontatti su bilo.it. Le auguro buona giornata."
+Questa è l'unica domanda sull'immobile. Qualunque cosa risponda il cliente, accetta la risposta e passa alla domanda successiva.
 
-# Guardrails
-- Mai parlare di prezzi o tempistiche precise
-- Mai fissare appuntamento se il cliente ha fretta di incassare
-- Mai suggerire esempi specifici nelle domande
-- Se il cliente è irritato: "Preferisce essere richiamato con più calma?"`,
-    change_reason: 'Initial Deployment',
-    created_at: '2024-10-01T10:00:00Z',
+## Domanda 2 — Tempi
+"Come dicevo, siamo quasi pronti con la valutazione del suo immobile. Il preliminare lo firmiamo in tempi rapidi — e lì riceve già un anticipo — mentre il rogito, cioè il saldo finale, arriva qualche mese dopo. Per lei il rogito può essere tra qualche mese, o ha bisogno di tempi più brevi?"
+
+## Chiusura
+Se qualificato: "Perfetto. La faccio ricontattare da un nostro consulente per approfondire insieme la sua situazione. Buona giornata!"
+Se non qualificato: "Perfetto, grazie mille per le informazioni. Riceverà a breve la valutazione del suo immobile. Buona giornata!"`,
+    change_reason: 'Flusso semplificato con 2 domande',
+    created_at: new Date().toISOString(),
     is_active: true,
     status: 'active',
-    performance_metrics: { avg_score: 7.2, conversion_rate: 18.5 }
+    performance_metrics: { avg_score: 8.2, conversion_rate: 45 }
   },
   {
     id: 'v0',
-    version_number: 0,
-    prompt_text: `Sei un assistente immobiliare. Chiedi se vogliono vendere.`,
-    change_reason: 'Alpha Test',
-    created_at: '2024-09-20T10:00:00Z',
+    version_number: 1,
+    prompt_text: `# Personality
+Sei Chiara, assistente vocale di Bilo...`,
+    change_reason: 'Versione iniziale',
+    created_at: '2024-10-01T10:00:00Z',
     is_active: false,
     status: 'archived',
-    performance_metrics: { avg_score: 4.5, conversion_rate: 5.2 }
+    performance_metrics: { avg_score: 6.5, conversion_rate: 18 }
   }
 ];

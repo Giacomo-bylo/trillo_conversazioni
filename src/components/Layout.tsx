@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Phone, Sparkles, History, LogOut, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Phone, History, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -42,11 +42,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <SidebarItem icon={Phone} label="Chiamate" path="/calls" active={location.pathname.startsWith('/calls')} />
           
           <div className="px-3 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            Ottimizzazione
+            Storico
           </div>
-          <SidebarItem icon={Sparkles} label="Prompt Optimizer" path="/optimizer" active={location.pathname === '/optimizer'} />
-          <SidebarItem icon={BarChart3} label="A/B Testing" path="/ab-testing" active={location.pathname === '/ab-testing'} />
-          <SidebarItem icon={History} label="Storico Versioni" path="/history" active={location.pathname === '/history'} />
+          <SidebarItem icon={History} label="Versioni Prompt" path="/history" active={location.pathname === '/history'} />
         </div>
 
         <div className="p-4 border-t border-gray-200">

@@ -1,7 +1,9 @@
 export enum CallOutcome {
-  QUALIFIED = 'qualified',
-  CALLBACK = 'callback',
-  NOT_QUALIFIED = 'not_qualified',
+  QUALIFIED = 'qualificato',
+  CALLBACK = 'callback_richiesto',
+  NOT_QUALIFIED = 'non_qualificato',
+  NO_ANSWER = 'non_risponde',
+  REFUSED = 'rifiuta_parlare',
 }
 
 export interface CallScore {
@@ -28,8 +30,21 @@ export interface Call {
   esito_qualificazione: string;
   durata_chiamata: number;
   created_at: string;
-  score?: CallScore;
   flagged?: boolean;
+  // Nuovi campi Post-Call Analysis
+  riepilogo_chiamata?: string;
+  chiamata_completata?: boolean;
+  stato_immobile?: string;
+  problematiche_immobile?: string;
+  urgenza_cliente?: 'alta' | 'media' | 'bassa';
+  appuntamento_fissato?: boolean;
+  callback_orario?: string;
+  callback_motivo?: string;
+  sentiment_cliente?: 'positivo' | 'neutro' | 'negativo' | 'ostile';
+  obiezioni_cliente?: string;
+  note_aggiuntive?: string;
+  // Score (relazione)
+  score?: CallScore;
 }
 
 export interface PromptVersion {
@@ -44,26 +59,6 @@ export interface PromptVersion {
   };
   is_active: boolean;
   status?: 'active' | 'testing' | 'archived';
-}
-
-export interface ABTest {
-  id: string;
-  test_name: string;
-  prompt_a_id: string;
-  prompt_b_id: string;
-  target_calls: number;
-  calls_a: number;
-  calls_b: number;
-  status: 'running' | 'completed' | 'cancelled';
-  winner_prompt_id?: string;
-  metrics_comparison?: {
-    score_a: number;
-    score_b: number;
-    conversion_a: number;
-    conversion_b: number;
-  };
-  started_at: string;
-  completed_at?: string;
 }
 
 export interface DashboardMetrics {
