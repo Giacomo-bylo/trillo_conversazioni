@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useCalls } from '@/hooks/useCalls';
 import { cn, formatDuration, formatDate } from '@/lib/utils';
 import { CallOutcome } from '@/types';
+import { ReportGenerator } from '@/components/ReportGenerator';
 
 const MetricCard = ({ title, value, trend, trendLabel, icon: Icon }: { 
   title: string; 
@@ -37,6 +38,7 @@ const MetricCard = ({ title, value, trend, trendLabel, icon: Icon }: {
 
 export const Dashboard = () => {
   const [filter, setFilter] = useState('all');
+  const [reportOpen, setReportOpen] = useState(false);
   const { calls, loading, error } = useCalls({ outcome: filter === 'all' ? undefined : filter });
 
   const totalCalls = calls.length;
@@ -75,7 +77,10 @@ export const Dashboard = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-        <button className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-md text-sm font-medium shadow-sm transition-colors">
+        <button 
+          onClick={() => setReportOpen(true)}
+          className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-md text-sm font-medium shadow-sm transition-colors"
+        >
           Genera Report
         </button>
       </div>
@@ -198,6 +203,13 @@ export const Dashboard = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Report Generator Modal */}
+      <ReportGenerator 
+        calls={calls} 
+        isOpen={reportOpen} 
+        onClose={() => setReportOpen(false)} 
+      />
     </div>
   );
 };
