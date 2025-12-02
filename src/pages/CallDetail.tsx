@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Play, Download, Clock, MessageSquare, User, Home, AlertTriangle, Calendar, FileText } from 'lucide-react';
+import { ArrowLeft, Download, Clock, MessageSquare, User, Home, AlertTriangle, Calendar, FileText } from 'lucide-react';
 import { useCall } from '@/hooks/useCalls';
 import { cn, formatDuration, formatDate } from '@/lib/utils';
 import { CallOutcome } from '@/types';
@@ -80,7 +80,7 @@ export const CallDetail = () => {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shrink-0">
         <div className="flex items-center gap-4">
-          <Link to="/" className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
+          <Link to="/calls" className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
             <ArrowLeft size={20} />
           </Link>
           <div>
@@ -108,28 +108,6 @@ export const CallDetail = () => {
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* Left: Transcript */}
         <div className="flex-1 flex flex-col min-w-0 border-r border-gray-200 bg-white">
-          {/* Audio Player Mock */}
-          <div className="p-4 border-b border-gray-200 bg-gray-50">
-             <div className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm flex items-center gap-4">
-                <button className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-hover shrink-0">
-                   <Play size={20} fill="currentColor" />
-                </button>
-                <div className="flex-1">
-                   <div className="h-8 flex items-center gap-1">
-                      {[...Array(40)].map((_, i) => (
-                         <div key={i} 
-                            className={cn("w-1 rounded-full", i < 15 ? "bg-primary" : "bg-gray-200")} 
-                            style={{ height: `${Math.random() * 24 + 4}px` }} 
-                         />
-                      ))}
-                   </div>
-                </div>
-                <div className="text-xs font-mono text-gray-500 shrink-0">
-                   00:00 / {formatDuration(call.durata_chiamata)}
-                </div>
-             </div>
-          </div>
-
           {/* Transcript */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {transcriptList.length > 0 ? (
