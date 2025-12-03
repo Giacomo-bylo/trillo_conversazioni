@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Filter, Search, ChevronRight } from 'lucide-react';
+import { Filter, Search, ChevronRight, Trash2 } from 'lucide-react';
 import { useCalls } from '@/hooks/useCalls';
 import { cn, formatDuration, formatDate } from '@/lib/utils';
 import { CallOutcome } from '@/types';
 import { ReportGenerator } from '@/components/ReportGenerator';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 export const CallsList = () => {
   const [filter, setFilter] = useState('all');
   const [reportOpen, setReportOpen] = useState(false);
-  const { calls, loading, error } = useCalls({ outcome: filter === 'all' ? undefined : filter });
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [callToDelete, setCallToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { calls, loading, error, refetch } = useCalls({ outcome: filter === 'all' ? undefined : filter });
 
   const getOutcomeBadge = (outcome: string) => {
     switch(outcome) {
@@ -26,6 +30,41 @@ export const CallsList = () => {
       default:
         return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">{outcome || 'N/A'}</span>;
     }
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setCallToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!callToDelete) return;
+    
+    setDeleting(true);
+    try {
+      if (isSupabaseConfigured && supabase) {
+        const { error } = await supabase
+          .from('calls')
+          .delete()
+          .eq('id', callToDelete);
+        
+        if (error) throw error;
+      }
+      
+      setDeleteModalOpen(false);
+      setCallToDelete(null);
+      refetch();
+    } catch (err) {
+      console.error('Errore eliminazione:', err);
+      alert('Errore durante l\'eliminazione');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
+    setCallToDelete(null);
   };
 
   if (loading) return <div className="p-10 flex items-center justify-center">Caricamento chiamate...</div>;
@@ -95,7 +134,7 @@ export const CallsList = () => {
               </tr>
             ) : (
               calls.map((call) => (
-                <tr key={call.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={call.id} className="hover:bg-gray-50 transition-colors group">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(call.created_at)}
                   </td>
@@ -139,9 +178,18 @@ export const CallsList = () => {
                     {formatDuration(call.durata_chiamata || 0)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link to={`/calls/${call.id}`} className="text-primary hover:text-primary-hover inline-flex items-center">
-                      Dettagli <ChevronRight size={16} />
-                    </Link>
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => handleDeleteClick(call.id)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Elimina"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                      <Link to={`/calls/${call.id}`} className="text-primary hover:text-primary-hover inline-flex items-center">
+                        Dettagli <ChevronRight size={16} />
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -156,6 +204,35 @@ export const CallsList = () => {
         isOpen={reportOpen} 
         onClose={() => setReportOpen(false)} 
       />
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Conferma eliminazione</h3>
+              <p className="text-gray-600">Sei sicuro di voler eliminare?</p>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end gap-3">
+              <button
+                onClick={handleDeleteCancel}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                disabled={deleting}
+              >
+                Annulla
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium flex items-center gap-2 transition-colors"
+                disabled={deleting}
+              >
+                <Trash2 size={16} />
+                {deleting ? 'Eliminazione...' : 'Elimina'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

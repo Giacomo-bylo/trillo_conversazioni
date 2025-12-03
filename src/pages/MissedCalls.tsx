@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PhoneMissed, RefreshCw } from 'lucide-react';
+import { PhoneMissed, RefreshCw, Trash2 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { cn, formatDate } from '@/lib/utils';
 
@@ -21,6 +21,9 @@ export const MissedCalls = () => {
   const [missedCalls, setMissedCalls] = useState<MissedCall[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [callToDelete, setCallToDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchMissedCalls = async () => {
     setLoading(true);
@@ -80,6 +83,46 @@ export const MissedCalls = () => {
     fetchMissedCalls();
   }, []);
 
+  const handleDeleteClick = (id: string) => {
+    setCallToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!callToDelete) return;
+    
+    setDeleting(true);
+    try {
+      if (isSupabaseConfigured && supabase) {
+        const { error } = await supabase
+          .from('missed_calls')
+          .delete()
+          .eq('id', callToDelete);
+        
+        if (error) throw error;
+      } else {
+        // Mock: rimuovi dalla lista locale
+        setMissedCalls(prev => prev.filter(c => c.id !== callToDelete));
+      }
+      
+      setDeleteModalOpen(false);
+      setCallToDelete(null);
+      if (isSupabaseConfigured && supabase) {
+        fetchMissedCalls();
+      }
+    } catch (err) {
+      console.error('Errore eliminazione:', err);
+      alert('Errore durante l\'eliminazione');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
+    setCallToDelete(null);
+  };
+
   if (loading) return <div className="p-10 flex items-center justify-center">Caricamento chiamate mancate...</div>;
   if (error) return <div className="p-10 flex items-center justify-center text-red-500">Errore: {error}</div>;
 
@@ -128,19 +171,19 @@ export const MissedCalls = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Indirizzo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tentativo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stato</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {missedCalls.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
-                  <PhoneMissed size={32} className="mx-auto mb-2 text-gray-300" />
+                <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
                   Nessuna chiamata mancata
                 </td>
               </tr>
             ) : (
               missedCalls.map((call) => (
-                <tr key={call.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={call.id} className="hover:bg-gray-50 transition-colors group">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(call.created_at)}
                   </td>
@@ -152,13 +195,8 @@ export const MissedCalls = () => {
                     {call.lead_indirizzo || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={cn(
-                      "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium",
-                      call.tentativo_n >= 3 ? "bg-red-50 text-red-700" :
-                      call.tentativo_n === 2 ? "bg-amber-50 text-amber-700" :
-                      "bg-gray-100 text-gray-700"
-                    )}>
-                      {call.tentativo_n}/3
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                      Tentativo {call.tentativo_n}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -168,9 +206,18 @@ export const MissedCalls = () => {
                       </span>
                     ) : (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                        In attesa
+                        Da richiamare
                       </span>
                     )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button
+                      onClick={() => handleDeleteClick(call.id)}
+                      className="p-1.5 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Elimina"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))
@@ -178,6 +225,35 @@ export const MissedCalls = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Conferma eliminazione</h3>
+              <p className="text-gray-600">Sei sicuro di voler eliminare?</p>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end gap-3">
+              <button
+                onClick={handleDeleteCancel}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                disabled={deleting}
+              >
+                Annulla
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium flex items-center gap-2 transition-colors"
+                disabled={deleting}
+              >
+                <Trash2 size={16} />
+                {deleting ? 'Eliminazione...' : 'Elimina'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
