@@ -2,6 +2,7 @@ import React from 'react';
 import { LayoutDashboard, Phone, PhoneMissed, PhoneForwarded, History, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SidebarItem = ({ icon: Icon, label, path, active }: { icon: React.ElementType, label: string, path: string, active: boolean }) => (
   <Link
@@ -20,6 +21,11 @@ const SidebarItem = ({ icon: Icon, label, path, active }: { icon: React.ElementT
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex font-sans">
@@ -50,10 +56,19 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         </div>
 
         <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 cursor-pointer">
+          {user && (
+            <div className="px-3 py-2 mb-2">
+              <div className="text-xs text-gray-400">Connesso come</div>
+              <div className="text-sm font-medium text-gray-700 truncate">{user.email}</div>
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+          >
             <LogOut size={18} />
             Esci
-          </div>
+          </button>
         </div>
       </aside>
 
